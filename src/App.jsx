@@ -15,6 +15,7 @@ function App() {
             return (
               <article className="note-item" key={index}>
                 <div className="note-title">{note.title}</div>
+                <button className="note-edit-button">✍️</button>
               </article>
             );
           })}
