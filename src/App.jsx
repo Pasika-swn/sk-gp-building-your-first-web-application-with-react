@@ -7,6 +7,7 @@ import "./App.css";
 // - render part of note
 // - control the edit/delete UI (not logic)
 function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
+  const [deletingItem, setDeletingItem] = useState(null);
   return (
     <article
       className={`note-item ${editing ? "note-editing" : ""}`}
@@ -21,10 +22,33 @@ function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
       </button>
       <button
         className="note-delete-button"
-        onClick={(event) => onDeleteNote?.(event)}
+        onClick={() => setDeletingItem(note)}
       >
         🗑️
       </button>
+      {deletingItem && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="modal-title">Are you sure?</h2>
+            <p>
+              To delete {'"'}
+              {deletingItem.title}
+              {'"'} note, click submit button below
+            </p>
+            <div className="modal-actions">
+              <button
+                onClick={(event) => {
+                  setDeletingItem(null);
+                  onDeleteNote?.(event);
+                }}
+              >
+                Submit
+              </button>
+              <button onClick={() => setDeletingItem(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </article>
   );
 }
@@ -38,10 +62,20 @@ function App() {
     }
     return [];
   });
-  const [deletingItem, setDeletingItem] = useState(null);
   useEffect(() => {
     localStorage.setItem("notes", JSON.stringify(notes));
   }, [notes]);
+
+  useEffect(() => {
+    const handleStorage = (event) => {
+      const value = event.newValue;
+      if (typeof event.key === "string" && event.key === "notes") {
+        setNotes(JSON.parse(value));
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
   return (
     <main className="container">
       <h1 className="app-title">Note App</h1>
@@ -59,7 +93,7 @@ function App() {
                   setNoteData(note);
                 }}
                 onDeleteNote={() => {
-                  setDeletingItem(note);
+                  setNotes(notes.filter((n) => n.id !== note.id));
                 }}
               />
             );
@@ -67,29 +101,6 @@ function App() {
         </div>
       ) : (
         <div className="empty-notes">No notes</div>
-      )}
-      {deletingItem && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2 className="modal-title">Are you sure?</h2>
-            <p>
-              To delete {'"'}
-              {deletingItem.title}
-              {'"'} note, click submit button below
-            </p>
-            <div className="modal-actions">
-              <button
-                onClick={() => {
-                  setDeletingItem(null);
-                  setNotes(notes.filter((n) => n.id !== deletingItem.id));
-                }}
-              >
-                Submit
-              </button>
-              <button onClick={() => setDeletingItem(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
       )}
 
       <br />
