@@ -3,8 +3,7 @@ import "@picocss/pico";
 import "./App.css";
 
 function App() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [noteData, setNoteData] = useState({ title: "", content: "" });
   const [notes, setNotes] = useState([]);
   return (
     <main className="container">
@@ -15,7 +14,14 @@ function App() {
             return (
               <article className="note-item" key={index}>
                 <div className="note-title">{note.title}</div>
-                <button className="note-edit-button">✍️</button>
+                <button
+                  className="note-edit-button"
+                  onClick={() => {
+                    setNoteData(note);
+                  }}
+                >
+                  ✍️
+                </button>
               </article>
             );
           })}
@@ -32,9 +38,12 @@ function App() {
           id="note-title"
           placeholder="Title of the note"
           required
-          value={title}
+          value={noteData.title}
           onChange={(event) => {
-            setTitle(event.target.value);
+            setNoteData((prevData) => ({
+              ...prevData,
+              title: event.target.value,
+            }));
           }}
         />
       </label>
@@ -44,18 +53,20 @@ function App() {
         <textarea
           placeholder="The content"
           required
-          value={content}
+          value={noteData.content}
           onChange={(event) => {
-            setContent(event.target.value);
+            setNoteData((prevData) => ({
+              ...prevData,
+              content: event.target.value,
+            }));
           }}
         ></textarea>
       </label>
       <button
         onClick={() => {
-          setNotes([...notes, { title, content }]);
+          setNotes([...notes, { ...noteData, id: Date.now() }]);
 
-          setTitle("");
-          setContent("");
+          setNoteData({ title: "", content: "" });
         }}
       >
         Submit
