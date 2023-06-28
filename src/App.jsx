@@ -5,6 +5,7 @@ import "./App.css";
 function App() {
   const [noteData, setNoteData] = useState({ title: "", content: "" });
   const [notes, setNotes] = useState([]);
+  const [open, setOpen] = useState(false);
   return (
     <main className="container">
       <h1 className="app-title">Note App</h1>
@@ -25,11 +26,29 @@ function App() {
                 <button
                   className="note-delete-button"
                   onClick={() => {
-                    setNotes(notes.filter((n) => n.id !== note.id));
+                    setOpen(true);
                   }}
                 >
                   🗑️
                 </button>
+                {open && (
+                  <div className="modal">
+                    <div className="modal-content">
+                      <h2>Are you sure?</h2>
+                      <p>To delete this note, click submit button below</p>
+                      <div className="modal-actions">
+                        <button
+                          onClick={() =>
+                            setNotes(notes.filter((n) => n.id !== note.id))
+                          }
+                        >
+                          Submit
+                        </button>
+                        <button onClick={() => setOpen(false)}>Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </article>
             );
           })}
