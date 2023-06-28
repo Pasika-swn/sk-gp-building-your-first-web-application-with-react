@@ -10,9 +10,9 @@ function App() {
       <h1 className="app-title">Note App</h1>
       {notes.length > 0 ? (
         <div className="note-list">
-          {notes.map((note, index) => {
+          {notes.map((note) => {
             return (
-              <article className="note-item" key={index}>
+              <article className="note-item" key={note.id}>
                 <div className="note-title">{note.title}</div>
                 <button
                   className="note-edit-button"
@@ -21,6 +21,14 @@ function App() {
                   }}
                 >
                   ✍️
+                </button>
+                <button
+                  className="note-delete-button"
+                  onClick={() => {
+                    setNotes(notes.filter((n) => n.id !== note.id));
+                  }}
+                >
+                  🗑️
                 </button>
               </article>
             );

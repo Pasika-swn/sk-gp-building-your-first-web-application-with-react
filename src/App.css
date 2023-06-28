@@ -40,6 +40,17 @@
   background: initial;
 }
 
+.note-delete-button {
+  margin: 0;
+  border-radius: 50%;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border: initial;
+  background: initial;
+}
+
 .empty-notes {
   padding: 1rem;
   background: rgba(0 0 0 / 0.08);
