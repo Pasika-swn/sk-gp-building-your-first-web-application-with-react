@@ -51,6 +51,10 @@
   background: initial;
 }
 
+.note-editing {
+  outline: 2px solid lightblue;
+}
+
 .empty-notes {
   padding: 1rem;
   background: rgba(0 0 0 / 0.08);

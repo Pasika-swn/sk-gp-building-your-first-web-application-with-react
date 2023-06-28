@@ -22,7 +22,12 @@ function App() {
         <div className="note-list">
           {notes.map((note) => {
             return (
-              <article className="note-item" key={note.id}>
+              <article
+                className={`note-item ${
+                  note.id === noteData?.id ? "note-editing" : ""
+                }`}
+                key={note.id}
+              >
                 <div className="note-title">{note.title}</div>
                 <button
                   className="note-edit-button"
