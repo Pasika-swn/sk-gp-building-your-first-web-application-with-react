@@ -25,3 +25,8 @@
   font-size: 1.125rem;
   font-weight: bold;
 }
+
+.empty-notes {
+  padding: 1rem;
+  background: rgba(0 0 0 / 0.08);
+}

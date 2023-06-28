@@ -5,18 +5,23 @@ import "./App.css";
 function App() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [notes, setNotes] = useState([]);
   return (
     <main className="container">
       <h1 className="app-title">Note App</h1>
-      <div className="note-list">
-        <article className="note-item">
-          <div className="note-title">My first note</div>
-        </article>
-
-        <article className="note-item">
-          <div className="note-title">My second note</div>
-        </article>
-      </div>
+      {notes.length > 0 ? (
+        <div className="note-list">
+          {notes.map((note, index) => {
+            return (
+              <article className="note-item" key={index}>
+                <div className="note-title">{note.title}</div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="empty-notes">No notes</div>
+      )}
 
       <br />
 
@@ -44,7 +49,16 @@ function App() {
           }}
         ></textarea>
       </label>
-      <button>Submit</button>
+      <button
+        onClick={() => {
+          setNotes([...notes, { title, content }]);
+
+          setTitle("");
+          setContent("");
+        }}
+      >
+        Submit
+      </button>
     </main>
   );
 }
