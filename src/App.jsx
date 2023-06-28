@@ -45,6 +45,8 @@ function App() {
   return (
     <main className="container">
       <h1 className="app-title">Note App</h1>
+      {/* Not recommend to refactor this part to a component, it's not flexibility when you want to change layout */}
+      {/* The layout could be horizontal, vertical, or a grid */}
       {notes.length > 0 ? (
         <div className="note-list">
           {notes.map((note) => {
