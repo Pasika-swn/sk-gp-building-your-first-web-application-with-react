@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "@picocss/pico";
 import "./App.css";
 
 function App() {
   const [noteData, setNoteData] = useState({ title: "", content: "" });
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(() => {
+    const savedNotes = localStorage.getItem("notes");
+    if (savedNotes) {
+      return JSON.parse(savedNotes);
+    }
+    return [];
+  });
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }, [notes]);
   return (
     <main className="container">
       <h1 className="app-title">Note App</h1>
