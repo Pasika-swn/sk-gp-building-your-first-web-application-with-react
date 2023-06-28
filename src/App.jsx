@@ -64,7 +64,20 @@ function App() {
       </label>
       <button
         onClick={() => {
-          setNotes([...notes, { ...noteData, id: Date.now() }]);
+          if (noteData.id) {
+            // update the note
+            setNotes(
+              notes.map((note) => {
+                if (note.id === noteData.id) {
+                  return noteData;
+                }
+                return note;
+              })
+            );
+          } else {
+            // create a new note
+            setNotes([...notes, { ...noteData, id: Date.now() }]);
+          }
 
           setNoteData({ title: "", content: "" });
         }}
