@@ -77,6 +77,10 @@
   flex-direction: column;
 }
 
+.modal-title {
+  margin-bottom: 1rem;
+}
+
 .modal-actions {
   display: flex;
   gap: 0.5rem;

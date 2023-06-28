@@ -11,7 +11,7 @@ function App() {
     }
     return [];
   });
-  const [open, setOpen] = useState(false);
+  const [deletingItem, setDeletingItem] = useState(null);
   useEffect(() => {
     localStorage.setItem("notes", JSON.stringify(notes));
   }, [notes]);
@@ -35,35 +35,40 @@ function App() {
                 <button
                   className="note-delete-button"
                   onClick={() => {
-                    setOpen(true);
+                    setDeletingItem(note);
                   }}
                 >
                   🗑️
                 </button>
-                {open && (
-                  <div className="modal">
-                    <div className="modal-content">
-                      <h2>Are you sure?</h2>
-                      <p>To delete this note, click submit button below</p>
-                      <div className="modal-actions">
-                        <button
-                          onClick={() =>
-                            setNotes(notes.filter((n) => n.id !== note.id))
-                          }
-                        >
-                          Submit
-                        </button>
-                        <button onClick={() => setOpen(false)}>Cancel</button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </article>
             );
           })}
         </div>
       ) : (
         <div className="empty-notes">No notes</div>
+      )}
+      {deletingItem && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="modal-title">Are you sure?</h2>
+            <p>
+              To delete {'"'}
+              {deletingItem.title}
+              {'"'} note, click submit button below
+            </p>
+            <div className="modal-actions">
+              <button
+                onClick={() => {
+                  setDeletingItem(null);
+                  setNotes(notes.filter((n) => n.id !== deletingItem.id));
+                }}
+              >
+                Submit
+              </button>
+              <button onClick={() => setDeletingItem(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
 
       <br />
