@@ -1,7 +1,10 @@
+import { useState } from "react";
 import "@picocss/pico";
 import "./App.css";
 
 function App() {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   return (
     <main className="container">
       <h1 className="app-title">Note App</h1>
@@ -19,12 +22,27 @@ function App() {
 
       <label htmlFor="note-title">
         Title
-        <input id="note-title" placeholder="Title of the note" required />
+        <input
+          id="note-title"
+          placeholder="Title of the note"
+          required
+          value={title}
+          onChange={(event) => {
+            setTitle(event.target.value);
+          }}
+        />
       </label>
 
       <label htmlFor="note-content">
         Content
-        <textarea placeholder="The content" required></textarea>
+        <textarea
+          placeholder="The content"
+          required
+          value={content}
+          onChange={(event) => {
+            setContent(event.target.value);
+          }}
+        ></textarea>
       </label>
       <button>Submit</button>
     </main>
