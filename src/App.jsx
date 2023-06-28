@@ -1,6 +1,33 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import "@picocss/pico";
 import "./App.css";
+
+// pure component without side effects
+// - render part of note
+// - control the edit/delete UI (not logic)
+function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
+  return (
+    <article
+      className={`note-item ${editing ? "note-editing" : ""}`}
+      key={note.id}
+    >
+      <div className="note-title">{note.title}</div>
+      <button
+        className="note-edit-button"
+        onClick={(event) => onEditNote?.(event)}
+      >
+        ✍️
+      </button>
+      <button
+        className="note-delete-button"
+        onClick={(event) => onDeleteNote?.(event)}
+      >
+        🗑️
+      </button>
+    </article>
+  );
+}
 
 function App() {
   const [noteData, setNoteData] = useState({ title: "", content: "" });
@@ -22,30 +49,17 @@ function App() {
         <div className="note-list">
           {notes.map((note) => {
             return (
-              <article
-                className={`note-item ${
-                  note.id === noteData?.id ? "note-editing" : ""
-                }`}
+              <NoteWidget
                 key={note.id}
-              >
-                <div className="note-title">{note.title}</div>
-                <button
-                  className="note-edit-button"
-                  onClick={() => {
-                    setNoteData(note);
-                  }}
-                >
-                  ✍️
-                </button>
-                <button
-                  className="note-delete-button"
-                  onClick={() => {
-                    setDeletingItem(note);
-                  }}
-                >
-                  🗑️
-                </button>
-              </article>
+                editing={note.id === noteData?.id}
+                note={note}
+                onEditNote={() => {
+                  setNoteData(note);
+                }}
+                onDeleteNote={() => {
+                  setDeletingItem(note);
+                }}
+              />
             );
           })}
         </div>
