@@ -78,7 +78,10 @@ function App() {
   }, []);
   return (
     <main className="container">
-      <h1 className="app-title">Note App</h1>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h1 className="app-title">Note App</h1>
+        <button style={{ width: "auto" }}>✍️</button>
+      </div>
       {/* Not recommend to refactor this part to a component, it's not flexibility when you want to change layout */}
       {/* The layout could be horizontal, vertical, or a grid */}
       {notes.length > 0 ? (
@@ -135,7 +138,7 @@ function App() {
           }}
         ></textarea>
       </label>
-      <button
+      {/* <button
         onClick={() => {
           if (noteData.id) {
             // update the note
@@ -156,7 +159,7 @@ function App() {
         }}
       >
         Submit
-      </button>
+      </button> */}
     </main>
   );
 }
