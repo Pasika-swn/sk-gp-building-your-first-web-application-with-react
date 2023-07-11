@@ -76,6 +76,30 @@ function App() {
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
+  const updateField = (field, value) => {
+    if (!noteData.id) {
+      const newId = Date.now();
+      setNoteData((prevData) => ({
+        ...prevData,
+        [field]: value,
+        id: newId,
+      }));
+      setNotes([...notes, { ...noteData, [field]: value, id: newId }]);
+    } else {
+      setNoteData((prevData) => ({
+        ...prevData,
+        [field]: value,
+      }));
+      setNotes(
+        notes.map((note) => {
+          if (note.id === noteData.id) {
+            return { ...noteData, [field]: value };
+          }
+          return note;
+        })
+      );
+    }
+  };
   return (
     <main className="container">
       <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -124,32 +148,7 @@ function App() {
               required
               value={noteData.title}
               onChange={(event) => {
-                const newTitle = event.target.value;
-                if (!noteData.id) {
-                  const newId = Date.now();
-                  setNoteData((prevData) => ({
-                    ...prevData,
-                    title: newTitle,
-                    id: newId,
-                  }));
-                  setNotes([
-                    ...notes,
-                    { ...noteData, title: newTitle, id: newId },
-                  ]);
-                } else {
-                  setNoteData((prevData) => ({
-                    ...prevData,
-                    title: newTitle,
-                  }));
-                  setNotes(
-                    notes.map((note) => {
-                      if (note.id === noteData.id) {
-                        return { ...noteData, title: newTitle };
-                      }
-                      return note;
-                    })
-                  );
-                }
+                updateField("title", event.target.value);
               }}
             />
           </label>
@@ -160,59 +159,12 @@ function App() {
               required
               value={noteData.content}
               onChange={(event) => {
-                const newContent = event.target.value;
-                if (!noteData.id) {
-                  const newId = Date.now();
-                  setNoteData((prevData) => ({
-                    ...prevData,
-                    content: newContent,
-                    id: newId,
-                  }));
-                  setNotes([
-                    ...notes,
-                    { ...noteData, content: newContent, id: newId },
-                  ]);
-                } else {
-                  setNoteData((prevData) => ({
-                    ...prevData,
-                    content: newContent,
-                  }));
-                  setNotes(
-                    notes.map((note) => {
-                      if (note.id === noteData.id) {
-                        return { ...noteData, content: newContent };
-                      }
-                      return note;
-                    })
-                  );
-                }
+                updateField("content", event.target.value);
               }}
             ></textarea>
           </label>
         </>
       )}
-      {/* <button
-        onClick={() => {
-          if (noteData.id) {
-            // update the note
-            setNotes(
-              notes.map((note) => {
-                if (note.id === noteData.id) {
-                  return noteData;
-                }
-                return note;
-              })
-            );
-          } else {
-            // create a new note
-            setNotes([...notes, { ...noteData, id: Date.now() }]);
-          }
-
-          setNoteData({ title: "", content: "" });
-        }}
-      >
-        Submit
-      </button> */}
     </main>
   );
 }
