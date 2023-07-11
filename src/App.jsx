@@ -54,7 +54,7 @@ function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
 }
 
 function App() {
-  const [noteData, setNoteData] = useState({ title: "", content: "" });
+  const [noteData, setNoteData] = useState(null);
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
     if (savedNotes) {
@@ -80,7 +80,12 @@ function App() {
     <main className="container">
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h1 className="app-title">Note App</h1>
-        <button style={{ width: "auto" }}>✍️</button>
+        <button
+          style={{ width: "auto" }}
+          onClick={() => setNoteData({ title: "", content: "" })}
+        >
+          ✍️
+        </button>
       </div>
       {/* Not recommend to refactor this part to a component, it's not flexibility when you want to change layout */}
       {/* The layout could be horizontal, vertical, or a grid */}
@@ -108,36 +113,62 @@ function App() {
 
       <br />
 
-      <label htmlFor="note-title">
-        Title
-        <input
-          id="note-title"
-          placeholder="Title of the note"
-          required
-          value={noteData.title}
-          onChange={(event) => {
-            setNoteData((prevData) => ({
-              ...prevData,
-              title: event.target.value,
-            }));
-          }}
-        />
-      </label>
-
-      <label htmlFor="note-content">
-        Content
-        <textarea
-          placeholder="The content"
-          required
-          value={noteData.content}
-          onChange={(event) => {
-            setNoteData((prevData) => ({
-              ...prevData,
-              content: event.target.value,
-            }));
-          }}
-        ></textarea>
-      </label>
+      {noteData && (
+        <>
+          <label htmlFor="note-title">
+            Title
+            <input
+              autoFocus
+              id="note-title"
+              placeholder="Title of the note"
+              required
+              value={noteData.title}
+              onChange={(event) => {
+                const newTitle = event.target.value;
+                if (!noteData.id) {
+                  const newId = Date.now();
+                  setNoteData((prevData) => ({
+                    ...prevData,
+                    title: newTitle,
+                    id: newId,
+                  }));
+                  setNotes([
+                    ...notes,
+                    { ...noteData, title: newTitle, id: newId },
+                  ]);
+                } else {
+                  setNoteData((prevData) => ({
+                    ...prevData,
+                    title: newTitle,
+                  }));
+                  setNotes(
+                    notes.map((note) => {
+                      if (note.id === noteData.id) {
+                        return { ...noteData, title: newTitle };
+                      }
+                      return note;
+                    })
+                  );
+                }
+              }}
+            />
+          </label>
+          <label htmlFor="note-content">
+            Content
+            <textarea
+              placeholder="The content"
+              required
+              value={noteData.content}
+              onChange={(event) => {
+                setNoteData((prevData) => ({
+                  ...prevData,
+                  content: event.target.value,
+                }));
+              }}
+            ></textarea>
+          </label>
+        </>
+      )}
       {/* <button
         onClick={() => {
           if (noteData.id) {
