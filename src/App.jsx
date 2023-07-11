@@ -160,10 +160,32 @@ function App() {
               required
               value={noteData.content}
               onChange={(event) => {
-                setNoteData((prevData) => ({
-                  ...prevData,
-                  content: event.target.value,
-                }));
+                const newContent = event.target.value;
+                if (!noteData.id) {
+                  const newId = Date.now();
+                  setNoteData((prevData) => ({
+                    ...prevData,
+                    content: newContent,
+                    id: newId,
+                  }));
+                  setNotes([
+                    ...notes,
+                    { ...noteData, content: newContent, id: newId },
+                  ]);
+                } else {
+                  setNoteData((prevData) => ({
+                    ...prevData,
+                    content: newContent,
+                  }));
+                  setNotes(
+                    notes.map((note) => {
+                      if (note.id === noteData.id) {
+                        return { ...noteData, content: newContent };
+                      }
+                      return note;
+                    })
+                  );
+                }
               }}
             ></textarea>
           </label>
