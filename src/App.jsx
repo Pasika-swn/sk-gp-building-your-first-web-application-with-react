@@ -53,6 +53,7 @@ function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 function useDebounceFn(fn, delay) {
   const timer = useRef(null);
   return (...args) => {
@@ -79,6 +80,7 @@ function useDebounceValue(value, delay) {
 
 function App() {
   const [noteData, setNoteData] = useState(null);
+  const [history, setHistory] = useState([]);
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
     if (savedNotes) {
@@ -103,8 +105,9 @@ function App() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  const saveNote = (data) => {
+  const saveNote = (data, prevData) => {
     const existingNote = notes.find((note) => note.id === data.id);
+    setHistory([prevData, ...history]);
     if (!existingNote) {
       setNotes([...notes, data]);
     } else {
@@ -127,13 +130,13 @@ function App() {
         [field]: value,
         id: newId,
       }));
-      saveNote({ ...noteData, [field]: value, id: newId });
+      saveNote({ ...noteData, [field]: value, id: newId }, noteData);
     } else {
       setNoteData((prevData) => ({
         ...prevData,
         [field]: value,
       }));
-      saveNote({ ...noteData, [field]: value });
+      saveNote({ ...noteData, [field]: value }, noteData);
     }
   };
   return (
@@ -199,6 +202,22 @@ function App() {
               }}
             ></textarea>
           </label>
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <button
+              style={{ width: "auto" }}
+              disabled={!history.length}
+              onClick={() => {
+                const previousNote = history[0];
+                if (previousNote) {
+                  setNoteData(previousNote);
+                  setHistory((latestHistory) => latestHistory.slice(1));
+                }
+              }}
+            >
+              Undo
+            </button>
+            <button style={{ width: "auto" }}>Redo</button>
+          </div>
         </>
       )}
     </main>
