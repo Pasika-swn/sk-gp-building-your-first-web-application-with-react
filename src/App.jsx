@@ -81,6 +81,7 @@ function useDebounceValue(value, delay) {
 function App() {
   const [noteData, setNoteData] = useState(null);
   const [history, setHistory] = useState([]);
+  const [future, setFuture] = useState([]);
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
     if (savedNotes) {
@@ -211,6 +212,7 @@ function App() {
                 if (previousNote) {
                   setNoteData(previousNote);
                   setHistory((latestHistory) => latestHistory.slice(1));
+                  setFuture((latestFuture) => [noteData, ...latestFuture]);
                 }
               }}
             >
