@@ -218,7 +218,20 @@ function App() {
             >
               Undo
             </button>
-            <button style={{ width: "auto" }}>Redo</button>
+            <button
+              style={{ width: "auto" }}
+              disabled={!future.length}
+              onClick={() => {
+                const lastNote = future[0];
+                if (lastNote) {
+                  setNoteData(lastNote);
+                  setHistory((latestHistory) => [noteData, ...latestHistory]);
+                  setFuture((latestFuture) => latestFuture.slice(1));
+                }
+              }}
+            >
+              Redo
+            </button>
           </div>
         </>
       )}
