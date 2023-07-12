@@ -63,6 +63,20 @@ function useDebounceFn(fn, delay) {
   };
 }
 
+function useDebounceValue(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay || 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 function App() {
   const [noteData, setNoteData] = useState(null);
   const [notes, setNotes] = useState(() => {
@@ -72,9 +86,11 @@ function App() {
     }
     return [];
   });
+  const debouncedNotes = useDebounceValue(notes, 1000);
   useEffect(() => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-  }, [notes]);
+    console.log("save to local storage", debouncedNotes);
+    localStorage.setItem("notes", JSON.stringify(debouncedNotes));
+  }, [debouncedNotes]);
 
   useEffect(() => {
     const handleStorage = (event) => {
@@ -87,7 +103,7 @@ function App() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  const saveNote = useDebounceFn((data) => {
+  const saveNote = (data) => {
     const existingNote = notes.find((note) => note.id === data.id);
     if (!existingNote) {
       setNotes([...notes, data]);
@@ -101,7 +117,7 @@ function App() {
         })
       );
     }
-  }, 1000);
+  };
 
   const updateField = (field, value) => {
     if (!noteData.id) {
