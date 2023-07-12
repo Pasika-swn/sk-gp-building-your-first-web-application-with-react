@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "@picocss/pico";
 import "./App.css";
 
@@ -53,6 +53,16 @@ function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
   );
 }
 
+function useDebounceFn(fn, delay) {
+  const timer = useRef(null);
+  return (...args) => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
 function App() {
   const [noteData, setNoteData] = useState(null);
   const [notes, setNotes] = useState(() => {
@@ -76,6 +86,23 @@ function App() {
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
+
+  const saveNote = useDebounceFn((data) => {
+    const existingNote = notes.find((note) => note.id === data.id);
+    if (!existingNote) {
+      setNotes([...notes, data]);
+    } else {
+      setNotes(
+        notes.map((note) => {
+          if (note.id === data.id) {
+            return data;
+          }
+          return note;
+        })
+      );
+    }
+  }, 1000);
+
   const updateField = (field, value) => {
     if (!noteData.id) {
       const newId = Date.now();
@@ -84,20 +111,13 @@ function App() {
         [field]: value,
         id: newId,
       }));
-      setNotes([...notes, { ...noteData, [field]: value, id: newId }]);
+      saveNote({ ...noteData, [field]: value, id: newId });
     } else {
       setNoteData((prevData) => ({
         ...prevData,
         [field]: value,
       }));
-      setNotes(
-        notes.map((note) => {
-          if (note.id === noteData.id) {
-            return { ...noteData, [field]: value };
-          }
-          return note;
-        })
-      );
+      saveNote({ ...noteData, [field]: value });
     }
   };
   return (
