@@ -64,6 +64,7 @@ function useDebounceFn(fn, delay) {
   };
 }
 
+// eslint-disable-next-line no-unused-vars
 function useDebounceValue(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -80,7 +81,9 @@ function useDebounceValue(value, delay) {
 
 function App() {
   const [noteData, setNoteData] = useState(null);
+  const noteDataRef = useRef(null);
   const [history, setHistory] = useState([]);
+  console.table(history);
   const [future, setFuture] = useState([]);
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
@@ -89,11 +92,9 @@ function App() {
     }
     return [];
   });
-  const debouncedNotes = useDebounceValue(notes, 1000);
   useEffect(() => {
-    console.log("save to local storage", debouncedNotes);
-    localStorage.setItem("notes", JSON.stringify(debouncedNotes));
-  }, [debouncedNotes]);
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }, [notes]);
 
   useEffect(() => {
     const handleStorage = (event) => {
@@ -106,7 +107,7 @@ function App() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  const saveNote = (data, prevData) => {
+  const saveNote = useDebounceFn((data, prevData) => {
     const existingNote = notes.find((note) => note.id === data.id);
     setHistory([prevData, ...history]);
     if (!existingNote) {
@@ -121,9 +122,13 @@ function App() {
         })
       );
     }
-  };
+    noteDataRef.current = null;
+  }, 1000);
 
   const updateField = (field, value) => {
+    if (!noteDataRef.current) {
+      noteDataRef.current = noteData;
+    }
     if (!noteData.id) {
       const newId = Date.now();
       setNoteData((prevData) => ({
@@ -131,13 +136,13 @@ function App() {
         [field]: value,
         id: newId,
       }));
-      saveNote({ ...noteData, [field]: value, id: newId }, noteData);
+      saveNote({ ...noteData, [field]: value, id: newId }, noteDataRef.current);
     } else {
       setNoteData((prevData) => ({
         ...prevData,
         [field]: value,
       }));
-      saveNote({ ...noteData, [field]: value }, noteData);
+      saveNote({ ...noteData, [field]: value }, noteDataRef.current);
     }
   };
   return (
