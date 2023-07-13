@@ -83,7 +83,6 @@ function App() {
   const [noteData, setNoteData] = useState(null);
   const noteDataRef = useRef(null);
   const [history, setHistory] = useState([]);
-  console.table(history);
   const [future, setFuture] = useState([]);
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
@@ -106,6 +105,31 @@ function App() {
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "z" && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        if (event.shiftKey) {
+          const lastNote = future[0];
+          if (lastNote) {
+            setNoteData(lastNote);
+            setHistory((latestHistory) => [noteData, ...latestHistory]);
+            setFuture((latestFuture) => latestFuture.slice(1));
+          }
+        } else {
+          const previousNote = history[0];
+          if (previousNote) {
+            setNoteData(previousNote);
+            setHistory((latestHistory) => latestHistory.slice(1));
+            setFuture((latestFuture) => [noteData, ...latestFuture]);
+          }
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [future, history, noteData]);
 
   const saveNote = useDebounceFn((data, prevData) => {
     const existingNote = notes.find((note) => note.id === data.id);
