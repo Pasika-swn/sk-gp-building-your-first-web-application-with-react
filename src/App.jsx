@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import "@picocss/pico";
 import "./App.css";
 
@@ -106,6 +106,25 @@ function App() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
+  const saveNotes = useCallback(
+    (data) => {
+      const existingNote = notes.find((note) => note.id === data.id);
+      if (!existingNote) {
+        setNotes([...notes, data]);
+      } else {
+        setNotes(
+          notes.map((note) => {
+            if (note.id === data.id) {
+              return data;
+            }
+            return note;
+          })
+        );
+      }
+    },
+    [notes]
+  );
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "z" && (event.ctrlKey || event.metaKey)) {
@@ -114,6 +133,7 @@ function App() {
           const lastNote = future[0];
           if (lastNote) {
             setNoteData(lastNote);
+            saveNotes(lastNote);
             setHistory((latestHistory) => [noteData, ...latestHistory]);
             setFuture((latestFuture) => latestFuture.slice(1));
           }
@@ -121,6 +141,7 @@ function App() {
           const previousNote = history[0];
           if (previousNote) {
             setNoteData(previousNote);
+            saveNotes(previousNote);
             setHistory((latestHistory) => latestHistory.slice(1));
             setFuture((latestFuture) => [noteData, ...latestFuture]);
           }
@@ -129,23 +150,11 @@ function App() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [future, history, noteData]);
+  }, [future, history, noteData, saveNotes]);
 
-  const saveNote = useDebounceFn((data, prevData) => {
-    const existingNote = notes.find((note) => note.id === data.id);
+  const debouncedSaveNote = useDebounceFn((data, prevData) => {
     setHistory([prevData, ...history]);
-    if (!existingNote) {
-      setNotes([...notes, data]);
-    } else {
-      setNotes(
-        notes.map((note) => {
-          if (note.id === data.id) {
-            return data;
-          }
-          return note;
-        })
-      );
-    }
+    saveNotes(data);
     noteDataRef.current = null;
   }, 1000);
 
@@ -160,13 +169,16 @@ function App() {
         [field]: value,
         id: newId,
       }));
-      saveNote({ ...noteData, [field]: value, id: newId }, noteDataRef.current);
+      debouncedSaveNote(
+        { ...noteData, [field]: value, id: newId },
+        noteDataRef.current
+      );
     } else {
       setNoteData((prevData) => ({
         ...prevData,
         [field]: value,
       }));
-      saveNote({ ...noteData, [field]: value }, noteDataRef.current);
+      debouncedSaveNote({ ...noteData, [field]: value }, noteDataRef.current);
     }
   };
   return (
@@ -240,6 +252,7 @@ function App() {
                 const previousNote = history[0];
                 if (previousNote) {
                   setNoteData(previousNote);
+                  saveNotes(previousNote);
                   setHistory((latestHistory) => latestHistory.slice(1));
                   setFuture((latestFuture) => [noteData, ...latestFuture]);
                 }
@@ -254,6 +267,7 @@ function App() {
                 const lastNote = future[0];
                 if (lastNote) {
                   setNoteData(lastNote);
+                  saveNotes(lastNote);
                   setHistory((latestHistory) => [noteData, ...latestHistory]);
                   setFuture((latestFuture) => latestFuture.slice(1));
                 }
