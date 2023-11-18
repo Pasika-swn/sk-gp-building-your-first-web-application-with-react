@@ -13,6 +13,9 @@ function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
       className={`note-item ${editing ? "note-editing" : ""}`}
       key={note.id}
     >
+      {note.image && (
+        <img alt="" src={note.image} style={{ display: "block", width: 24 }} />
+      )}
       <div className="note-title">{note.title}</div>
       <button
         className="note-edit-button"
@@ -243,6 +246,29 @@ function App() {
                 updateField("content", event.target.value);
               }}
             ></textarea>
+          </label>
+          <label style={{ display: "grid" }}>
+            Image
+            {noteData.image && (
+              <img
+                alt=""
+                src={noteData.image}
+                style={{ display: "block", width: 100 }}
+              />
+            )}
+            <input
+              type="file"
+              value=""
+              accept="image/*"
+              multiple={false}
+              onChange={(event) => {
+                const file = event.target.files[0];
+                if (event.target.files.length) {
+                  updateField("image", URL.createObjectURL(file));
+                }
+              }}
+              style={{ color: "transparent" }}
+            />
           </label>
           <div style={{ display: "flex", gap: "1rem" }}>
             <button
