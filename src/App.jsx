@@ -3,10 +3,10 @@ import "@picocss/pico";
 import "./App.css";
 
 function App() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [noteData, setNoteData] = useState({title:"", content:""})
 
   const [notes, setNotes] = useState([]);
+
 
   return (
     <main className="container">
@@ -16,6 +16,9 @@ function App() {
         {notes.map((note, index) => (
           <article key={index} className="note-item">
             <div>{note.title}</div>
+            <button onClick={()=>{
+              setNoteData(note)
+            }} className="note-edit-button">✍️</button>
           </article>
         ))}
       </div>
@@ -29,8 +32,8 @@ function App() {
             name="title"
             placeholder="The note's title"
             required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={noteData.title}
+            onChange={(e) => setNoteData({...noteData, title:e.target.value})}
           />
         </label>
 
@@ -42,19 +45,20 @@ function App() {
             name="content"
             placeholder="The note's content"
             required
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={noteData.content}
+            onChange={(e) => setNoteData({...noteData, content:e.target.value})}
           />
           <button
             type="button"
             onClick={() => {
               //save the title and content to note
-              setNotes([...notes, { title, content }]);
-              setTitle("");
-              setContent("");
+              setNotes([...notes, noteData]);
+              // setTitle("");
+              // setContent("");
+              setNoteData({title:'', content:""})
             }}
           >
-            Save
+            Submit
           </button>
         </label>
       </div>
