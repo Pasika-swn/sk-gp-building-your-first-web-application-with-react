@@ -3,18 +3,21 @@ import "@picocss/pico";
 import "./App.css";
 
 function App() {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+  const [notes, setNotes] = useState([]);
+
   return (
     <main className="container">
       <h1 className="app-title">My notes</h1>
 
       <div className="note-list">
-        <article className="note-item">
-          <div>Note 1</div>
-        </article>
-
-        <article className="note-item">
-          <div>Note 2</div>
-        </article>
+        {notes.map((note, index) => (
+          <article key={index} className="note-item">
+            <div>{note.title}</div>
+          </article>
+        ))}
       </div>
 
       <div className="note-title">
@@ -26,6 +29,8 @@ function App() {
             name="title"
             placeholder="The note's title"
             required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </label>
 
@@ -37,8 +42,20 @@ function App() {
             name="content"
             placeholder="The note's content"
             required
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
           />
-          <button type="button">Save</button>
+          <button
+            type="button"
+            onClick={() => {
+              //save the title and content to note
+              setNotes([...notes, { title, content }]);
+              setTitle("");
+              setContent("");
+            }}
+          >
+            Save
+          </button>
         </label>
       </div>
     </main>
