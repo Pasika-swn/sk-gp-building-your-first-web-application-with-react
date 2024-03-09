@@ -32,10 +32,10 @@ function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
 }
 
 function App() {
-  const [noteData, setNoteData] = useState({ title: "", content: "" });
+  const [noteData, setNoteData] = useState(null);
 
   const [notes, setNotes] = useState(() => {
-    return JSON.parse(localStorage.getItem("notes")) ?? []
+    return JSON.parse(localStorage.getItem("notes")) ?? [];
   });
 
   const [deletingItem, setDeletingItem] = useState(null);
@@ -44,20 +44,29 @@ function App() {
     localStorage.setItem("notes", JSON.stringify(notes));
   }, [notes]);
 
-  useEffect(()=>{
+  useEffect(() => {
     function handleStorageChange(event) {
-      if(event.key === "notes"){
-        setNotes(JSON.parse(event.newValue) ?? [])
+      if (event.key === "notes") {
+        setNotes(JSON.parse(event.newValue) ?? []);
       }
     }
 
-    window.addEventListener("storage", handleStorageChange)
-    return (()=>window.removeEventListener("storage", handleStorageChange))
-  },[])
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   return (
     <main className="container">
-      <h1 className="app-title">My notes</h1>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h1 className="app-title">Note App</h1>
+        <button
+          onClick={() => {
+            setNoteData({ title: "", content: "" });
+          }}
+        >
+          📝
+        </button>
+      </div>
 
       <div className="note-list">
         {notes.map((note) => {
@@ -65,7 +74,7 @@ function App() {
             <NoteWidget
               note={note}
               key={note.id}
-              editing={note.id === noteData.id}
+              editing={note.id === noteData?.id}
               onEditNote={() => {
                 setNoteData(note);
               }}
@@ -104,36 +113,67 @@ function App() {
         )}
       </div>
 
-      <div className="note-title">
-        <label htmlFor="title">
-          Title
-          <input
-            type="text"
-            id="title"
-            name="title"
-            placeholder="The note's title"
-            required
-            value={noteData.title}
-            onChange={(e) =>
-              setNoteData({ ...noteData, title: e.target.value })
-            }
-          />
-        </label>
+      {noteData && (
+        <>
+          <label htmlFor="title">
+            Title
+            <input
+              type="text"
+              id="title"
+              name="title"
+              placeholder="The note's title"
+              required
+              value={noteData.title}
+              onChange={(event) => {
+                if (noteData.id) {
+                  const newData = {
+                    ...noteData,
+                    title: event.target.value,
+                  };
+                  //save to the existing note
+                  setNotes(
+                    notes.map((item) => {
+                      if (item.id === newData.id) {
+                        return newData;
+                      }
+                      return item; //return ของเก่า
+                    })
+                  );
+                  setNoteData(newData);
+                } else {
+                  //add new note to the list
+                  const newId = Date.now();
+                  const newData = {
+                    ...noteData,
+                    title: event.target.value,
+                    id: newId,
+                  };
+                  setNotes([...notes, newData]);
+                  setNoteData(newData);
+                }
+              }}
+            />
+          </label>
 
-        <label htmlFor="content">
-          Content
-          <textarea
-            type="text"
-            id="content"
-            name="content"
-            placeholder="The note's content"
-            required
-            value={noteData.content}
-            onChange={(e) =>
-              setNoteData({ ...noteData, content: e.target.value })
-            }
-          />
-          <button
+          <label htmlFor="content">
+            Content
+            <textarea
+              type="text"
+              id="content"
+              name="content"
+              placeholder="The note's content"
+              required
+              value={noteData.content}
+              onChange={(e) =>
+                setNoteData({ ...noteData, content: e.target.value })
+              }
+            />
+          </label>
+        </>
+      )}
+
+      {/* <div className="note-title">
+        <button
             type="button"
             onClick={() => {
               //save the title and content to note
@@ -156,8 +196,7 @@ function App() {
           >
             Submit
           </button>
-        </label>
-      </div>
+      </div> */}
     </main>
   );
 }
