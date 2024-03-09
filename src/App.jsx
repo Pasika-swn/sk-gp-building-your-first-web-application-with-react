@@ -15,7 +15,12 @@ function App() {
 
       <div className="note-list">
         {notes.map((note) => (
-          <article key={note.id} className="note-item">
+          <article
+            key={note.id}
+            className={`note-item ${
+              note.id === noteData.id ? "note-editing" : ""
+            }`}
+          >
             <div>{note.title}</div>
             <button
               onClick={() => {

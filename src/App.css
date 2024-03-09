@@ -86,3 +86,7 @@
 .modal-actions > * {
   flex: 1;
 }
+
+.note-editing {
+  outline: 2px solid lightblue;
+}
