@@ -7,13 +7,15 @@ function App() {
 
   const [notes, setNotes] = useState([]);
 
+  const [deletingItem, setDeletingItem] = useState(null);
+
   return (
     <main className="container">
       <h1 className="app-title">My notes</h1>
 
       <div className="note-list">
-        {notes.map((note, index) => (
-          <article key={index} className="note-item">
+        {notes.map((note) => (
+          <article key={note.id} className="note-item">
             <div>{note.title}</div>
             <button
               onClick={() => {
@@ -23,8 +25,43 @@ function App() {
             >
               ✍️
             </button>
+            <button
+              className="note-delete-button"
+              onClick={() => {
+                setDeletingItem(note);
+              }}
+            >
+              🚮
+            </button>
           </article>
         ))}
+      </div>
+
+      <div>
+        {deletingItem && (
+          <div className="modal">
+            <div className="modal-content">
+              <div className="modal-title">Are you sure?</div>
+              <p>
+                To delete {deletingItem.title} note, click the submit button
+                below
+              </p>
+              <div className="modal-actions">
+                <button
+                  onClick={() => {
+                    setNotes(
+                      notes.filter((item) => deletingItem.id !== item.id)
+                    );
+                    setDeletingItem(null);
+                  }}
+                >
+                  Yes
+                </button>
+                <button onClick={() => setDeletingItem(null)}>No</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="note-title">
@@ -62,15 +99,17 @@ function App() {
               //save the title and content to note
               if (noteData.id) {
                 //save to the existing note
-                setNotes(notes.map((item)=>{
-                  if(item.id === noteData.id) {
-                    return noteData
-                  }
-                  return item //return ของเก่า
-                }))
+                setNotes(
+                  notes.map((item) => {
+                    if (item.id === noteData.id) {
+                      return noteData;
+                    }
+                    return item; //return ของเก่า
+                  })
+                );
               } else {
                 //add new note to the list
-                setNotes([...notes, {...noteData, id: Date.now() }]);
+                setNotes([...notes, { ...noteData, id: Date.now() }]);
               }
               setNoteData({ title: "", content: "" });
             }}
