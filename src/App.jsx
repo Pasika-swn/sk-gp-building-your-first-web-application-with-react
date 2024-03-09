@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "@picocss/pico";
 import "./App.css";
 
@@ -34,9 +34,15 @@ function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
 function App() {
   const [noteData, setNoteData] = useState({ title: "", content: "" });
 
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(() => {
+    return JSON.parse(localStorage.getItem("notes")) ?? []
+  });
 
   const [deletingItem, setDeletingItem] = useState(null);
+
+  useEffect(() => {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }, [notes]);
 
   return (
     <main className="container">
@@ -44,20 +50,19 @@ function App() {
 
       <div className="note-list">
         {notes.map((note) => {
-          return(
-            <NoteWidget 
-              note = {note}
+          return (
+            <NoteWidget
+              note={note}
               key={note.id}
               editing={note.id === noteData.id}
               onEditNote={() => {
-                  setNoteData(note);
-                } }
+                setNoteData(note);
+              }}
               onDeleteNote={() => {
-                  setDeletingItem(note);
-                }}
+                setDeletingItem(note);
+              }}
             />
-          )
-          
+          );
         })}
       </div>
 
