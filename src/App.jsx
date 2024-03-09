@@ -2,6 +2,35 @@ import { useState } from "react";
 import "@picocss/pico";
 import "./App.css";
 
+//dont add any logics -> just using props (ex: editing)
+function NoteWidget({ note, editing, onEditNote, onDeleteNote }) {
+  return (
+    <article
+      key={note.id}
+      className={`note-item ${editing ? "note-editing" : ""}`}
+    >
+      <div>{note.title}</div>
+      <button
+        onClick={() => {
+          onEditNote?.();
+          //equal to -> if(onEditNote) {onEditNote()}
+        }}
+        className="note-edit-button"
+      >
+        ✍️
+      </button>
+      <button
+        className="note-delete-button"
+        onClick={() => {
+          onDeleteNote?.();
+        }}
+      >
+        🚮
+      </button>
+    </article>
+  );
+}
+
 function App() {
   const [noteData, setNoteData] = useState({ title: "", content: "" });
 
@@ -14,32 +43,22 @@ function App() {
       <h1 className="app-title">My notes</h1>
 
       <div className="note-list">
-        {notes.map((note) => (
-          <article
-            key={note.id}
-            className={`note-item ${
-              note.id === noteData.id ? "note-editing" : ""
-            }`}
-          >
-            <div>{note.title}</div>
-            <button
-              onClick={() => {
-                setNoteData(note);
-              }}
-              className="note-edit-button"
-            >
-              ✍️
-            </button>
-            <button
-              className="note-delete-button"
-              onClick={() => {
-                setDeletingItem(note);
-              }}
-            >
-              🚮
-            </button>
-          </article>
-        ))}
+        {notes.map((note) => {
+          return(
+            <NoteWidget 
+              note = {note}
+              key={note.id}
+              editing={note.id === noteData.id}
+              onEditNote={() => {
+                  setNoteData(note);
+                } }
+              onDeleteNote={() => {
+                  setDeletingItem(note);
+                }}
+            />
+          )
+          
+        })}
       </div>
 
       <div>
